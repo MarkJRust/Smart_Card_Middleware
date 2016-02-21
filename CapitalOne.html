@@ -15,6 +15,33 @@
 // Decline credit card
 // }
 
+function sendText(success,bankAmt,purchaseAmt){
+		var text;
+		
+		if (success)
+			text = "Congrats! You just charged $" + purchaseAmt + " to your account! Your bank balance is $" + (bankAmt - purchaseAmt); 
+		else
+			text = "Sorry! You do not have the allocated funds to charge $" + purchaseAmt + ". Your bank balance is $" + bankAmt;
+		
+		$.ajax({
+                method: "POST",
+                dataType: "json",
+                url: "https://api.twilio.com/2010-04-01/Accounts/AC6bf2223618ee273bad8836f36941cf4f/Messages.json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Basic " + btoa("AC6bf2223618ee273bad8836f36941cf4f" + ":" + "e7089bbeda4e929bc531f44d7ff314a8"));
+                },
+                data: { To: $("#phone").val(),
+                    From: '2482923323',
+                    Body: text
+                }
+            })
+            .done(function( data ) {
+                if ( console && console.log ) {
+                    console.log( data );
+                }
+            });
+}
+
 
 function accountDemo(apikey, account, purchase, transfer) {
     var custAccounts = account.initWithKey(apikey);
@@ -40,21 +67,11 @@ function accountDemo(apikey, account, purchase, transfer) {
 		var merchantId = '56c8dc33061b2d440baf43c2';
 		var purchasejson = '{ "merchant_id": "' + merchantId + '", "medium": "balance", "amount": '+purchaseAmt+', "status": "pending", "description": "string" }';
 		console.log("[purchase - create purchase] Response: " + custPurchases.createPurchase(creditCardAcctId, purchasejson));
-
-		custAccounts = account.initWithKey(apikey);
-		creditCardAcct = custAccounts.getAccountById(creditCardAcctId);
-		checkingAcct = custAccounts.getAccountById(checkingAcctId);
 		
-		alert(creditCardAcct.balance);
-		alert(checkingAcct.balance);
-		
-		alert("PASS");
+		sendText(true,checkingAcct.balance,purchaseAmt);
 	}
 	else{
-		alert(creditCardAcct.balance);
-		alert(checkingAcct.balance);
-		alert("FAIL");
-		
+		sendText(false,checkingAcct.balance,purchaseAmt);
 	}
 	
 	
@@ -77,9 +94,10 @@ function makePurchase(){
 <h1>Error checking test: Make a purchase</h1>
 Purchase Amount: $<input type="text" id="txtPurchaseAmt" />
 <br />
-<input type="button" onclick="makePurchase()" value="Can I make this purchase?" />
+<input type="button" onclick="makePurchase()" value="Make purchase" />
+	<br /><br />
+    <input type="text" id="phone" />
 
-<div id="lblPurchaseResponse">
 </div>
 
 </body>
