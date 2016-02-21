@@ -14,10 +14,8 @@
 // } else {
 // Decline credit card
 // }
-
 function sendText(success,bankAmt,purchaseAmt){
 		var text;
-		
 		if (success)
 			text = "Congrats! You just charged $" + purchaseAmt + " to your account! Your bank balance is $" + (bankAmt - purchaseAmt); 
 		else
@@ -42,8 +40,9 @@ function sendText(success,bankAmt,purchaseAmt){
             });
 }
 
-
 function accountDemo(apikey, account, purchase, transfer) {
+	var j = jQuery.noConflict();
+
     var custAccounts = account.initWithKey(apikey);
 	var custPurchases = purchase.initWithKey(apikey);
 	var custTransfers = transfer.initWithKey(apikey);
@@ -55,7 +54,7 @@ function accountDemo(apikey, account, purchase, transfer) {
 	var checkingAcct = custAccounts.getAccountById(checkingAcctId);
 	var checkingAcctBalance = checkingAcct.balance;
 	
-	var purchaseAmt = $("#txtPurchaseAmt").val();
+	var purchaseAmt = j("#txtPurchaseAmt").val();
 	
 	if(checkingAcctBalance >= purchaseAmt){
 		console.log(custAccounts);
@@ -78,13 +77,10 @@ function accountDemo(apikey, account, purchase, transfer) {
 }
 
 function makePurchase(){
-	
-	$(function(){
     require(['account', 'purchase', 'transfer'], function (account, purchase, transfer) {
         var apikey = 'eacbc18c16dada73517937943a206f44';
         accountDemo(apikey, account, purchase, transfer);
         });
-	});
 }
 
 </script>
