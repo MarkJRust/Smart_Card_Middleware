@@ -1,0 +1,87 @@
+<html>
+
+<head><title>Capital One Testing</title></head>
+
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script> 
+	 <script data-main="lib/capital_one" src="lib/require-jquery.js"></script>
+
+<script>
+// bool purchaseAllowed = (balance >= purchaseAmt)
+
+// if (purchaseAllowed){
+// 1. Transfer purchaseAmt from checking acct to cc
+// 2. Purchase: charge our credit card with purchaseAmt
+// } else {
+// Decline credit card
+// }
+
+
+function accountDemo(apikey, account, purchase, transfer) {
+    var custAccounts = account.initWithKey(apikey);
+	var custPurchases = purchase.initWithKey(apikey);
+	var custTransfers = transfer.initWithKey(apikey);
+	
+	var creditCardAcctId = "56c8ec79061b2d440baf43e1";
+	var checkingAcctId = "56c8d9c2061b2d440baf43af";
+	
+	var creditCardAcct = custAccounts.getAccountById(creditCardAcctId);
+	var checkingAcct = custAccounts.getAccountById(checkingAcctId);
+	var checkingAcctBalance = checkingAcct.balance;
+	
+	var purchaseAmt = $("#txtPurchaseAmt").val();
+	
+	if(checkingAcctBalance >= purchaseAmt){
+		console.log(custAccounts);
+		console.log(checkingAcct);
+		// 1. Transfer purchaseAmt from checking acct to cc
+		console.log(custTransfers.createTransfer(checkingAcctId,'{"medium": "balance","payee_id": "'+creditCardAcctId+'","amount": '+purchaseAmt+',"transaction_date": "2016-02-21","status": "pending","description": "string"}'));
+		
+		// 2. Purchase: charge our credit card with purchaseAmt
+		var merchantId = '56c8dc33061b2d440baf43c2';
+		var purchasejson = '{ "merchant_id": "' + merchantId + '", "medium": "balance", "amount": '+purchaseAmt+', "status": "pending", "description": "string" }';
+		console.log("[purchase - create purchase] Response: " + custPurchases.createPurchase(creditCardAcctId, purchasejson));
+
+		custAccounts = account.initWithKey(apikey);
+		creditCardAcct = custAccounts.getAccountById(creditCardAcctId);
+		checkingAcct = custAccounts.getAccountById(checkingAcctId);
+		
+		alert(creditCardAcct.balance);
+		alert(checkingAcct.balance);
+		
+		alert("PASS");
+	}
+	else{
+		alert(creditCardAcct.balance);
+		alert(checkingAcct.balance);
+		alert("FAIL");
+		
+	}
+	
+	
+}
+
+function makePurchase(){
+	
+	$(function(){
+    require(['account', 'purchase', 'transfer'], function (account, purchase, transfer) {
+        var apikey = 'eacbc18c16dada73517937943a206f44';
+        accountDemo(apikey, account, purchase, transfer);
+        });
+	});
+}
+
+</script>
+
+<body>
+
+<h1>Error checking test: Make a purchase</h1>
+Purchase Amount: $<input type="text" id="txtPurchaseAmt" />
+<br />
+<input type="button" onclick="makePurchase()" value="Can I make this purchase?" />
+
+<div id="lblPurchaseResponse">
+</div>
+
+</body>
+
+</html>

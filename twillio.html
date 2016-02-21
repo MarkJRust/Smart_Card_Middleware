@@ -9,24 +9,21 @@ src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
     
 <script>
     $(document).ready(function() {
-        $('#butt').click(function() {
-            $.ajax({
-                method: "GET",
-                dataType: "json",
-                url: "https://api.twilio.com/2010-04-01/Accounts/AC6bf2223618ee273bad8836f36941cf4f/Messages.json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", "Basic " + btoa("AC6bf2223618ee273bad8836f36941cf4f" + ":" + "e7089bbeda4e929bc531f44d7ff314a8"));
-                }
-            })
-            .done(function( data ) {
-                if ( console && console.log ) {
-                    console.log( data );
-                }
-            });
-        });
-        
+	
         $('#send').click(function() {
-            $.ajax({
+            sendText(true);
+        });
+    });
+	
+function sendText(success){
+		var text;
+		
+		if (success)
+			text = "PASS"
+		else
+			text = "FAIL"
+		
+		$.ajax({
                 method: "POST",
                 dataType: "json",
                 url: "https://api.twilio.com/2010-04-01/Accounts/AC6bf2223618ee273bad8836f36941cf4f/Messages.json",
@@ -35,7 +32,7 @@ src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
                 },
                 data: { To: $("#phone").val(),
                     From: '2482923323',
-                    Body: 'Your balance is $XXXX'
+                    Body: text
                 }
             })
             .done(function( data ) {
@@ -43,13 +40,11 @@ src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
                     console.log( data );
                 }
             });
-        });
-    });
+}
 </script>
 </head>
 <body>
 <header>
-    <input type="button" id="butt" value="TEST" />
     <input type="button" id="send" value="Send" />
     <input type="text" id="phone" />
 </header>
